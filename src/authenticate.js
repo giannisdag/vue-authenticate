@@ -87,6 +87,30 @@ export default class VueAuthenticate {
     return this.storage.getItem(this.tokenName)
   }
 
+  setRefreshToken(response) {
+    if (response[this.options.responseDataKey]) {
+      response = response[this.options.responseDataKey];
+    }
+
+    let token;
+    if (response.refresh_token) {
+      if (isObject(response.refresh_token) && isObject(response.refresh_token[this.options.responseDataKey])) {
+        response = response.refresh_token
+      } else if (isString(response.refresh_token)) {
+        token = response.refresh_token
+      }
+    }
+
+    if (!token && response) {
+      token = response[this.options.tokenName]
+    }
+
+    if (token) {
+      this.storage.setItem(this.tokenName, token)
+    }
+
+  }
+
   /**
    * Set new authentication token
    * @param {String|Object} token
@@ -95,7 +119,7 @@ export default class VueAuthenticate {
     if (response[this.options.responseDataKey]) {
       response = response[this.options.responseDataKey];
     }
-    
+
     let token;
     if (response.access_token) {
       if (isObject(response.access_token) && isObject(response.access_token[this.options.responseDataKey])) {
@@ -125,7 +149,7 @@ export default class VueAuthenticate {
       } catch (e) {}
     }
   }
-  
+
   /**
    * Login user using email and password
    * @param  {Object} user           User data
@@ -192,7 +216,7 @@ export default class VueAuthenticate {
 
   /**
    * Authenticate user using authentication provider
-   * 
+   *
    * @param  {String} provider       Provider name
    * @param  {Object} userData       User data
    * @param  {Object} requestOptions Request options
